@@ -916,6 +916,7 @@ interface UnipoolTransactions {
 
 export interface Unipool
   extends _TypedLiquityContract<UnipoolCalls, UnipoolTransactions> {
+  address: string;
   readonly filters: {
     LQTYTokenAddressChanged(_lqtyTokenAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;

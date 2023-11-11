@@ -15,6 +15,7 @@
   "types": "dist/index.d.ts",
   "repository": "https://github.com/liquity/dev",
   "scripts": {
+    "build": "yarn prepare:deployments && yarn prepare:tsc",
     "hardhat": "hardhat",
     "check-live-version": "ts-node scripts/check-live-version.ts",
     "delete-dev-deployments": "ts-node scripts/delete-dev-deployments.ts",
