@@ -288,7 +288,11 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         checkContract(_lusdTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_priceFeedAddress);
-        checkContract(_communityIssuanceAddress);
+
+        // Allow to set empty community issuance address before governance token is issued
+        if (_communityIssuanceAddress != address(0)) {
+            checkContract(_communityIssuanceAddress);
+        }
 
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
@@ -305,8 +309,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         emit SortedTrovesAddressChanged(_sortedTrovesAddress);
         emit PriceFeedAddressChanged(_priceFeedAddress);
         emit CommunityIssuanceAddressChanged(_communityIssuanceAddress);
-
-        _renounceOwnership();
     }
 
     // --- Getters for public variables. Required by IPool interface ---
@@ -463,6 +465,8 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     // --- LQTY issuance functions ---
 
     function _triggerLQTYIssuance(ICommunityIssuance _communityIssuance) internal {
+        if (address(_communityIssuance) == address(0)) return;
+
         uint LQTYIssuance = _communityIssuance.issueLQTY();
        _updateG(LQTYIssuance);
     }
@@ -931,9 +935,11 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
         }
 
         // Pay out depositor's LQTY gain
-        uint depositorLQTYGain = getDepositorLQTYGain(_depositor);
-        _communityIssuance.sendLQTY(_depositor, depositorLQTYGain);
-        emit LQTYPaidToDepositor(_depositor, depositorLQTYGain);
+        if (address(_communityIssuance) != address(0)) {
+            uint depositorLQTYGain = getDepositorLQTYGain(_depositor);
+            _communityIssuance.sendLQTY(_depositor, depositorLQTYGain);
+            emit LQTYPaidToDepositor(_depositor, depositorLQTYGain);
+        }
     }
 
     // --- 'require' functions ---

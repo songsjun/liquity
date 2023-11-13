@@ -60,7 +60,7 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
 
-        _renounceOwnership();
+        // _renounceOwnership();
     }
 
     // --- Getters for public variables. Required by IPool interface ---

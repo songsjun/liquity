@@ -25,8 +25,8 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
     IStabilityPool immutable stabilityPool;
     IPriceFeed immutable priceFeed;
     IERC20 immutable lusdToken;
-    IERC20 immutable lqtyToken;
-    ILQTYStaking immutable lqtyStaking;
+    IERC20 lqtyToken;
+    ILQTYStaking lqtyStaking;
 
     constructor(
         address _borrowerOperationsAddress,
@@ -53,13 +53,13 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         checkContract(lusdTokenCached);
         lusdToken = IERC20(lusdTokenCached);
 
-        address lqtyTokenCached = address(troveManagerCached.lqtyToken());
-        checkContract(lqtyTokenCached);
-        lqtyToken = IERC20(lqtyTokenCached);
+        // address lqtyTokenCached = address(troveManagerCached.lqtyToken());
+        // checkContract(lqtyTokenCached);
+        // lqtyToken = IERC20(lqtyTokenCached);
 
-        ILQTYStaking lqtyStakingCached = troveManagerCached.lqtyStaking();
-        require(_lqtyStakingAddress == address(lqtyStakingCached), "BorrowerWrappersScript: Wrong LQTYStaking address");
-        lqtyStaking = lqtyStakingCached;
+        // ILQTYStaking lqtyStakingCached = troveManagerCached.lqtyStaking();
+        // require(_lqtyStakingAddress == address(lqtyStakingCached), "BorrowerWrappersScript: Wrong LQTYStaking address");
+        // lqtyStaking = lqtyStakingCached;
     }
 
     function claimCollateralAndOpenTrove(uint _maxFee, uint _LUSDAmount, address _upperHint, address _lowerHint) external payable {
