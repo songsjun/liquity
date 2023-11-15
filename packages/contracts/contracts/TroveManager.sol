@@ -8,11 +8,12 @@ import "./Interfaces/ICollSurplusPool.sol";
 import "./Interfaces/ILUSDToken.sol";
 import "./Interfaces/ISortedTroves.sol";
 import "./Dependencies/LiquityBase.sol";
-import "./Dependencies/Ownable.sol";
+import "./Dependencies/OwnableUpgradeable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
 
-contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
+contract TroveManager is LiquityBase, OwnableUpgradeable, CheckContract, ITroveManager, Initializable {
     string constant public NAME = "TroveManager";
 
     // --- Connected contract declarations ---
@@ -220,7 +221,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         redeemCollateral
     }
 
-
+    function initialize() initializer external {
+        __Ownable_init();
+    }
     // --- Dependency setter ---
 
     function setAddresses(

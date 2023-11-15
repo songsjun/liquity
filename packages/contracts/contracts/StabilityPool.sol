@@ -12,9 +12,10 @@ import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/LiquitySafeMath128.sol";
-import "./Dependencies/Ownable.sol";
+import "./Dependencies/OwnableUpgradeable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
 
 /*
  * The Stability Pool holds LUSD tokens deposited by Stability Pool depositors.
@@ -145,7 +146,7 @@ import "./Dependencies/console.sol";
  * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
  *
  */
-contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
+contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabilityPool, Initializable {
     using LiquitySafeMath128 for uint128;
 
     string constant public NAME = "StabilityPool";
@@ -266,6 +267,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     event LQTYPaidToDepositor(address indexed _depositor, uint _LQTY);
     event LQTYPaidToFrontEnd(address indexed _frontEnd, uint _LQTY);
     event EtherSent(address _to, uint _amount);
+
+    function initialize() initializer external {
+        __Ownable_init();
+    }
 
     // --- Contract setters ---
 
