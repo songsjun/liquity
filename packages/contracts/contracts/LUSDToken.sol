@@ -28,8 +28,8 @@ contract LUSDToken is CheckContract, ILUSDToken {
     using SafeMath for uint256;
     
     uint256 private _totalSupply;
-    string constant internal _NAME = "ioNOTE Stablecoin";
-    string constant internal _SYMBOL = "ioNOTE";
+    string constant internal _NAME = "WEN";
+    string constant internal _SYMBOL = "WEN";
     string constant internal _VERSION = "1";
     uint8 constant internal _DECIMALS = 18;
     
