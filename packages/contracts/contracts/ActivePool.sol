@@ -4,9 +4,10 @@ pragma solidity 0.6.11;
 
 import './Interfaces/IActivePool.sol';
 import "./Dependencies/SafeMath.sol";
-import "./Dependencies/Ownable.sol";
+import "./Dependencies/OwnableUpgradeable.sol";
 import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
 
 /*
  * The Active Pool holds the ETH collateral and LUSD debt (but not LUSD tokens) for all active troves.
@@ -15,7 +16,7 @@ import "./Dependencies/console.sol";
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  *
  */
-contract ActivePool is Ownable, CheckContract, IActivePool {
+contract ActivePool is OwnableUpgradeable, CheckContract, IActivePool, Initializable {
     using SafeMath for uint256;
 
     string constant public NAME = "ActivePool";
@@ -34,6 +35,9 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
     event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
     event ActivePoolETHBalanceUpdated(uint _ETH);
 
+    function initialize() initializer external {
+        __Ownable_init();
+    }
     // --- Contract setters ---
 
     function setAddresses(
@@ -59,8 +63,6 @@ contract ActivePool is Ownable, CheckContract, IActivePool {
         emit TroveManagerAddressChanged(_troveManagerAddress);
         emit StabilityPoolAddressChanged(_stabilityPoolAddress);
         emit DefaultPoolAddressChanged(_defaultPoolAddress);
-
-        // _renounceOwnership();
     }
 
     // --- Getters for public variables. Required by IPool interface ---
