@@ -200,7 +200,7 @@ contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabi
     * During its lifetime, a deposit's value evolves from d_t to d_t * P / P_t , where P_t
     * is the snapshot of P taken at the instant the deposit was made. 18-digit decimal.
     */
-    uint public P = DECIMAL_PRECISION;
+    uint public P;
 
     uint public constant SCALE_FACTOR = 1e9;
 
@@ -270,6 +270,7 @@ contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabi
 
     function initialize() initializer external {
         __Ownable_init();
+        P = DECIMAL_PRECISION;
     }
 
     // --- Contract setters ---
@@ -293,11 +294,7 @@ contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabi
         checkContract(_lusdTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_priceFeedAddress);
-
-        // Allow to set empty community issuance address before governance token is issued
-        if (_communityIssuanceAddress != address(0)) {
-            checkContract(_communityIssuanceAddress);
-        }
+        checkContract(_communityIssuanceAddress);
 
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);
