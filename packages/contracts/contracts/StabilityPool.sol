@@ -930,7 +930,7 @@ contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabi
 
     function _payOutLQTYGains(ICommunityIssuance _communityIssuance, address _depositor, address _frontEnd) internal {
         // Pay out front end's LQTY gain
-        if (_frontEnd != address(0)) {
+        if (_frontEnd != address(0) && address(_communityIssuance) != address(0)) {
             uint frontEndLQTYGain = getFrontEndLQTYGain(_frontEnd);
             _communityIssuance.sendLQTY(_frontEnd, frontEndLQTYGain);
             emit LQTYPaidToFrontEnd(_frontEnd, frontEndLQTYGain);
