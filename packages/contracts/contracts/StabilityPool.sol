@@ -294,7 +294,9 @@ contract StabilityPool is LiquityBase, OwnableUpgradeable, CheckContract, IStabi
         checkContract(_lusdTokenAddress);
         checkContract(_sortedTrovesAddress);
         checkContract(_priceFeedAddress);
-        checkContract(_communityIssuanceAddress);
+        if (_communityIssuanceAddress != address(0)) {
+            checkContract(_communityIssuanceAddress);
+        }
 
         borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
         troveManager = ITroveManager(_troveManagerAddress);

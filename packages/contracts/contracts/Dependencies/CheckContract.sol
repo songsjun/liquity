@@ -9,8 +9,8 @@ contract CheckContract {
      * See: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol#L12
      */
     function checkContract(address _account) internal view {
-        if (_account == address(0)) return;
-
+        require(_account != address(0), "Account cannot be zero address");
+        
         uint256 size;
         // solhint-disable-next-line no-inline-assembly
         assembly { size := extcodesize(_account) }
