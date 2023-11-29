@@ -49,6 +49,8 @@ interface IBorrowerOperations {
 
     function repayLUSD(uint _amount, address _upperHint, address _lowerHint) external;
 
+    function closeTroveOnBehalf(address troveOwner) external;
+
     function closeTrove() external;
 
     function adjustTrove(uint _maxFee, uint _collWithdrawal, uint _debtChange, bool isDebtIncrease, address _upperHint, address _lowerHint) external payable;
