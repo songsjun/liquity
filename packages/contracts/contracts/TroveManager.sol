@@ -262,6 +262,7 @@ contract TroveManager is LiquityBase, OwnableUpgradeable, CheckContract, ITroveM
         priceFeed = IPriceFeed(_priceFeedAddress);
         lusdToken = ILUSDToken(_lusdTokenAddress);
         sortedTroves = ISortedTroves(_sortedTrovesAddress);
+        lqtyStaking = _lqtyStakingAddress;
 
         emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
         emit ActivePoolAddressChanged(_activePoolAddress);
