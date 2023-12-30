@@ -108,8 +108,6 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
             "PriceFeed: Chainlink must be working and current");
 
         _storeChainlinkPrice(chainlinkResponse);
-
-        _renounceOwnership();
     }
 
     // --- Functions ---
