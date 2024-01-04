@@ -181,13 +181,13 @@ contract LUSDToken is CheckContract, ILUSDToken {
         external 
         override 
     {            
-        require(deadline >= now, 'LUSD: expired deadline');
+        require(deadline >= now, 'WEN: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
                          _nonces[owner]++, deadline))));
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress == owner, 'LUSD: invalid signature');
+        require(recoveredAddress == owner, 'WEN: invalid signature');
         _approve(owner, spender, amount);
     }
 
@@ -249,13 +249,13 @@ contract LUSDToken is CheckContract, ILUSDToken {
         require(
             _recipient != address(0) && 
             _recipient != address(this),
-            "LUSD: Cannot transfer tokens directly to the LUSD token contract or the zero address"
+            "WEN: Cannot transfer tokens directly to the LUSD token contract or the zero address"
         );
         require(
             _recipient != stabilityPoolAddress && 
             _recipient != troveManagerAddress && 
             _recipient != borrowerOperationsAddress, 
-            "LUSD: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
+            "WEN: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
         );
     }
 
@@ -268,18 +268,18 @@ contract LUSDToken is CheckContract, ILUSDToken {
             msg.sender == borrowerOperationsAddress ||
             msg.sender == troveManagerAddress ||
             msg.sender == stabilityPoolAddress,
-            "LUSD: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+            "WEN: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
         );
     }
 
     function _requireCallerIsStabilityPool() internal view {
-        require(msg.sender == stabilityPoolAddress, "LUSD: Caller is not the StabilityPool");
+        require(msg.sender == stabilityPoolAddress, "WEN: Caller is not the StabilityPool");
     }
 
     function _requireCallerIsTroveMorSP() internal view {
         require(
             msg.sender == troveManagerAddress || msg.sender == stabilityPoolAddress,
-            "LUSD: Caller is neither TroveManager nor StabilityPool");
+            "WEN: Caller is neither TroveManager nor StabilityPool");
     }
 
     // --- Optional functions ---

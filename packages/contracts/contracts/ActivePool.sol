@@ -6,8 +6,7 @@ import './Interfaces/IActivePool.sol';
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/OwnableUpgradeable.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/console.sol";
-import "@openzeppelin/contracts/proxy/Initializable.sol";
+import "./Dependencies/Initializable.sol";
 
 /*
  * The Active Pool holds the ETH collateral and LUSD debt (but not LUSD tokens) for all active troves.
@@ -34,6 +33,10 @@ contract ActivePool is OwnableUpgradeable, CheckContract, IActivePool, Initializ
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event ActivePoolLUSDDebtUpdated(uint _LUSDDebt);
     event ActivePoolETHBalanceUpdated(uint _ETH);
+
+    constructor() public {
+        _disableInitializers();
+    }
 
     function initialize() initializer external {
         __Ownable_init();
@@ -95,13 +98,13 @@ contract ActivePool is OwnableUpgradeable, CheckContract, IActivePool, Initializ
     function increaseLUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveM();
         LUSDDebt  = LUSDDebt.add(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        emit ActivePoolLUSDDebtUpdated(LUSDDebt);
     }
 
     function decreaseLUSDDebt(uint _amount) external override {
         _requireCallerIsBOorTroveMorSP();
         LUSDDebt = LUSDDebt.sub(_amount);
-        ActivePoolLUSDDebtUpdated(LUSDDebt);
+        emit ActivePoolLUSDDebtUpdated(LUSDDebt);
     }
 
     // --- 'require' functions ---
