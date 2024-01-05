@@ -54,9 +54,14 @@ contract CommunityToken is ERC20, Ownable {
 
         if (from == address(0)) { // When minting tokens
             require(totalSupply() + amount <= _cap, "ERC20Capped: cap exceeded");
+            return;
         }
 
-        if (whitelistEnabled) {
+        if (to == address(0)) { // when burning tokens
+            return;
+        }
+
+        if (whitelistEnabled) { // normal operations
             require(whitelist[from], "Only whitelist account are allowed to transfer token");
         }
     }
