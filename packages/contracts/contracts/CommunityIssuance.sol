@@ -19,9 +19,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
 
     string constant public NAME = "CommunityIssuance";
 
-    uint constant public SECONDS_IN_ONE_MINUTE = 60;
-
-    uint public ISSUANCE_FACTOR;
+    uint public issuancePerSecond;
 
     uint public LQTYSupplyCap;
 
@@ -30,7 +28,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     address public stabilityPoolAddress;
 
     uint public totalLQTYIssued;
-    uint public deploymentTime;
+    uint public lastIssuanceTime;
 
     // --- Events ---
 
@@ -48,68 +46,54 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
 
     function initialize() initializer external {
         __Ownable_init();
-        deploymentTime = block.timestamp;
+        lastIssuanceTime = block.timestamp;
     }
 
-    function setAddresses
-    (
-        address _lqtyTokenAddress, 
-        address _stabilityPoolAddress
-    ) 
-        external 
-        onlyOwner 
-        override 
-    {
+    function setAddresses(address _lqtyTokenAddress, address _stabilityPoolAddress) external onlyOwner override {
         checkContract(_lqtyTokenAddress);
         checkContract(_stabilityPoolAddress);
 
         lqtyToken = IERC20(_lqtyTokenAddress);
         stabilityPoolAddress = _stabilityPoolAddress;
 
-        // When LQTYToken deployed, it should have transferred CommunityIssuance's LQTY entitlement
-        uint LQTYBalance = lqtyToken.balanceOf(address(this));
-        assert(LQTYBalance >= LQTYSupplyCap);
-
         emit LQTYTokenAddressSet(_lqtyTokenAddress);
         emit StabilityPoolAddressSet(_stabilityPoolAddress);
     }
 
-    function setParams(uint issuanceFactor, uint supplyCap)  external onlyOwner {
-        emit IssuanceFactorUpdated(ISSUANCE_FACTOR, issuanceFactor);
-        emit SupplyCapUpdated(LQTYSupplyCap, supplyCap);
+    function setParams(address _lqtyTokenAddress, uint _issuanceFactor)  external onlyOwner {
+        checkContract(_lqtyTokenAddress);
 
-        ISSUANCE_FACTOR = issuanceFactor;
-        LQTYSupplyCap = supplyCap;
+        if (_lqtyTokenAddress != address(lqtyToken)) {
+            lqtyToken = IERC20(_lqtyTokenAddress);
+            issuancePerSecond = _issuanceFactor;
+            totalLQTYIssued = 0;
+            lastIssuanceTime = block.timestamp;
+            LQTYSupplyCap = lqtyToken.balanceOf(address(this));
+
+            emit SupplyCapUpdated(0, LQTYSupplyCap);
+            emit LQTYTokenAddressSet(_lqtyTokenAddress);
+        }
+        emit IssuanceFactorUpdated(issuancePerSecond, _issuanceFactor);
+    
+        issuancePerSecond = _issuanceFactor;
     }
 
     function issueLQTY() external override returns (uint) {
         _requireCallerIsStabilityPool();
 
-        uint latestTotalLQTYIssued = LQTYSupplyCap.mul(_getCumulativeIssuanceFraction()).div(DECIMAL_PRECISION);
-        uint issuance = latestTotalLQTYIssued.sub(totalLQTYIssued);
+        if (issuancePerSecond == 0) return 0;
 
-        totalLQTYIssued = latestTotalLQTYIssued;
-        emit TotalLQTYIssuedUpdated(latestTotalLQTYIssued);
+        uint issuance = block.timestamp.sub(lastIssuanceTime).mul(issuancePerSecond);
+        lastIssuanceTime = block.timestamp;
+        totalLQTYIssued = totalLQTYIssued.add(issuance);
+        if (totalLQTYIssued > LQTYSupplyCap) {
+            uint delta = totalLQTYIssued.sub(LQTYSupplyCap);
+            issuance = issuance.sub(delta);
+            totalLQTYIssued = LQTYSupplyCap;
+        }
+        emit TotalLQTYIssuedUpdated(totalLQTYIssued);
         
         return issuance;
-    }
-
-    /* Gets 1-f^t    where: f < 1
-
-    f: issuance factor that determines the shape of the curve
-    t:  time passed since last LQTY issuance event  */
-    function _getCumulativeIssuanceFraction() internal view returns (uint) {
-        // Get the time passed since deployment
-        uint timePassedInMinutes = block.timestamp.sub(deploymentTime).div(SECONDS_IN_ONE_MINUTE);
-
-        // f^t
-        uint power = LiquityMath._decPow(ISSUANCE_FACTOR, timePassedInMinutes);
-
-        //  (1 - f^t)
-        uint cumulativeIssuanceFraction = (uint(DECIMAL_PRECISION).sub(power));
-        assert(cumulativeIssuanceFraction <= DECIMAL_PRECISION); // must be in range [0,1]
-
-        return cumulativeIssuanceFraction;
     }
 
     function sendLQTY(address _account, uint _LQTYamount) external override {
@@ -123,4 +107,8 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     function _requireCallerIsStabilityPool() internal view {
         require(msg.sender == stabilityPoolAddress, "CommunityIssuance: caller is not SP");
     }
+
+    function _getCumulativeIssuanceFraction() internal view returns (uint) {
+    }
+
 }
