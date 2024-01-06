@@ -63,7 +63,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     function setParams(address _lqtyTokenAddress, uint _issuanceFactor)  external onlyOwner {
         checkContract(_lqtyTokenAddress);
 
-        if (_lqtyTokenAddress != address(lqtyToken)) {
+        if (_lqtyTokenAddress != address(lqtyToken) || LQTYSupplyCap == 0) {
             lqtyToken = IERC20(_lqtyTokenAddress);
             issuancePerSecond = _issuanceFactor;
             totalLQTYIssued = 0;
