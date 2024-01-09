@@ -79,9 +79,9 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     }
 
     function issueLQTY() external override returns (uint) {
-        _requireCallerIsStabilityPool();
-
         if (issuancePerSecond == 0) return 0;
+
+        _requireCallerIsStabilityPool();
 
         uint issuance = block.timestamp.sub(lastIssuanceTime).mul(issuancePerSecond);
         lastIssuanceTime = block.timestamp;
@@ -97,6 +97,8 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     }
 
     function sendLQTY(address _account, uint _LQTYamount) external override {
+        if (issuancePerSecond == 0) return;
+
         _requireCallerIsStabilityPool();
 
         lqtyToken.transfer(_account, _LQTYamount);
