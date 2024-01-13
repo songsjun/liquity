@@ -97,7 +97,7 @@ contract CommunityIssuance is ICommunityIssuance, OwnableUpgradeable, CheckContr
     }
 
     function sendLQTY(address _account, uint _LQTYamount) external override {
-        if (issuancePerSecond == 0) return;
+        if (issuancePerSecond == 0 && address(lqtyToken) == address(0)) return;
 
         _requireCallerIsStabilityPool();
 
