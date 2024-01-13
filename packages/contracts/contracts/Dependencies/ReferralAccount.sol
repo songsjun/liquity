@@ -11,6 +11,7 @@ interface SimpleStabilityPool {
 contract ReferralAccount is Initializable {
     address public owner;
     address public stabilityPool;
+    address public creater;
 
     event Withdraw(address token, address to, uint amount);
     event RegisterReferralAccount(address owner, address referralAccount, uint _kickbackRate);
@@ -22,6 +23,7 @@ contract ReferralAccount is Initializable {
     function initialize(address _owner, address _stabilityPool) initializer external {
         owner = _owner;
         stabilityPool = _stabilityPool;
+        creater = msg.sender;
     } 
 
     function withdraw(address token) external {
@@ -39,6 +41,8 @@ contract ReferralAccount is Initializable {
     }
 
     function registerReferralAccount(uint _kickbackRate) external {
+        require(msg.sender == owner || msg.sender == creater, "Only owner or creater can register");
+        
         SimpleStabilityPool(stabilityPool).registerFrontEnd(_kickbackRate);
 
         emit RegisterReferralAccount(owner, address(this), _kickbackRate);
