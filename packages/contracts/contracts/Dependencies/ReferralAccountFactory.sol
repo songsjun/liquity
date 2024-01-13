@@ -15,17 +15,19 @@ contract ReferralAccountFactory {
         uint accountId;
     }
 
-    Counters.Counter idCounter;
+    Counters.Counter public idCounter;
     // ReferralAccount Owner => ReferralAccount
     mapping(address => ReferentAccountData) public referralAccounts;
     mapping(uint256 => address) public referralAccountFinder;
 
     address public referralAccountTemplate;
+    address public stabilityPool;
 
     event ReferralAccountCreated(address owner, address accountAddress, uint accountId);
 
-    constructor(address _referralAccountTemplate) public {
+    constructor(address _referralAccountTemplate, address _stabilityPool) public {
         referralAccountTemplate = _referralAccountTemplate;
+        stabilityPool = _stabilityPool;
     }
 
     function createReferralAccount() external {
@@ -33,7 +35,7 @@ contract ReferralAccountFactory {
         require(referralAccounts[referralAccountOwner].accountAddress == address(0), "Referral account already exists");
 
         address referralAccount = referralAccountTemplate.clone();
-        ReferralAccount(referralAccount).initialize(referralAccountOwner);
+        ReferralAccount(referralAccount).initialize(referralAccountOwner, stabilityPool);
 
         idCounter.increment();
         uint currentId = idCounter.current();

@@ -4,17 +4,24 @@ pragma solidity 0.6.11;
 import "./IERC20.sol";
 import "./Initializable.sol";
 
+interface SimpleStabilityPool {
+    function registerFrontEnd(uint _kickbackRate) external;
+}
+
 contract ReferralAccount is Initializable {
     address public owner;
+    address public stabilityPool;
 
     event Withdraw(address token, address to, uint amount);
+    event RegisterReferralAccount(address owner, address referralAccount, uint _kickbackRate);
 
     constructor() public {
         _disableInitializers();
     }
 
-    function initialize(address _owner) initializer external {
+    function initialize(address _owner, address _stabilityPool) initializer external {
         owner = _owner;
+        stabilityPool = _stabilityPool;
     } 
 
     function withdraw(address token) external {
@@ -30,4 +37,11 @@ contract ReferralAccount is Initializable {
 
         emit Withdraw(token, owner, amount);
     }
+
+    function registerReferralAccount(uint _kickbackRate) external {
+        SimpleStabilityPool(stabilityPool).registerFrontEnd(_kickbackRate);
+
+        emit RegisterReferralAccount(owner, address(this), _kickbackRate);
+    }
+
 }
